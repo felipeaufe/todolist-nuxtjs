@@ -9,7 +9,7 @@ export default {
   ** Nuxt target
   ** See https://nuxtjs.org/api/configuration-target
   */
-  target: 'static',
+  target: 'server',
   /*
   ** Headers of the page
   ** See https://nuxtjs.org/api/configuration-head
@@ -29,12 +29,17 @@ export default {
   ** Global CSS
   */
   css: [
+    // '@/assets/sass/main.sass'
   ],
   /*
   ** Plugins to load before mounting the App
   ** https://nuxtjs.org/guide/plugins
   */
   plugins: [
+      './plugins/click-outside.js',
+      './plugins/axios.js',
+      './plugins/newVersion.js',
+      './plugins/modaConfirmBox.js',
   ],
   /*
   ** Auto import components
@@ -45,7 +50,6 @@ export default {
   ** Nuxt.js dev-modules
   */
   buildModules: [
-    '@nuxt/typescript-build',
   ],
   /*
   ** Nuxt.js modules
@@ -53,7 +57,37 @@ export default {
   modules: [
     // Doc: https://bootstrap-vue.js.org
     'bootstrap-vue/nuxt',
+    '@nuxtjs/axios',
   ],
+
+  env: {
+    api_key: process.env.API_KEY || ''
+  },
+
+  /************************************************************
+   * Axios default configurations
+   ************************************************************/
+  axios: {
+    // proxyHeaders: false,
+    proxy: true,
+    baseURL: process.env.API_URL || ''
+  },
+  proxy: {
+  },
+  /************************************************************/
+
+  publicRuntimeConfig: {
+    axios: {
+      browserBaseURL: process.env.API_URL
+    }
+  },
+
+  privateRuntimeConfig: {
+    axios: {
+      baseURL: process.env.API_URL
+    }
+  },
+
   /*
   ** Build configuration
   ** See https://nuxtjs.org/api/configuration-build/

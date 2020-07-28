@@ -2,6 +2,8 @@
   "name": "nuxt_app",
   "version": "1.0.0",
   "private": true,
+  "os" : [ "linux" ],
+  "cpu" : [ "x64" ],
   "scripts": {
     "dev": "nuxt",
     "build": "nuxt build",
@@ -11,11 +13,9 @@
     "serve": "docker-compose up"
   },
   "dependencies": {
-    "@nuxtjs/axios": "^5.12.0",
     "bootstrap": "4.5.0",
     "bootstrap-vue": "2.15.0",
-    "nuxt": "2.13.0",
-    "vuedraggable": "^2.24.0"
+    "nuxt": "2.13.0"
   },
   "devDependencies": {
     "node-sass": "4.12.x",
