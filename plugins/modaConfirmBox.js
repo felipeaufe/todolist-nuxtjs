@@ -1,6 +1,14 @@
 export default (context, inject) => {
-    function confirm (title, description, btnYes, btnNo) {
 
+    /**
+     * Modal to style the window.confirm
+     * 
+     * @param {string} title 
+     * @param {string} description 
+     * @param {string} btnYes 
+     * @param {string} btnNo 
+     */
+    function confirm (title, description, btnYes, btnNo) {
         if(typeof arguments[0] === "object"){
             description = arguments[0].description;
             btnYes = arguments[0].btnYes;

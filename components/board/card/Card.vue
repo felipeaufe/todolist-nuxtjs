@@ -1,9 +1,9 @@
 <template>
     <div class="card" @click="editCard">
         <div class="info">
-            <p class="todo-title">{{task.title}}</p>
+            <p class="todo-title">{{todo.title}}</p>
             <div class="todo-footer">
-                <ul v-if="task.description">
+                <ul v-if="todo.description">
                     <li></li>
                     <li></li>
                     <li></li>
@@ -26,7 +26,7 @@
 
     export default {
         props: {
-            task: {
+            todo: {
                 type: Object,
                 default: () => ({})
             },
@@ -40,12 +40,12 @@
                     QA: "green",
                     default: "teal"
                 };
-                return mappings[this.task.type] || mappings.default;
+                return mappings[this.todo.type] || mappings.default;
             }
         },
         methods: {
             async editCard() {
-                await this.$store.commit('card/editCard', this.task);
+                await this.$store.commit('card/editCard', this.todo);
                 this.$root.$emit('bv::show::modal', 'card-modal')
             }
         }
@@ -62,6 +62,7 @@
         cursor: pointer
         display: flex
         flex-direction: row
+        justify-content: space-between
         &:hover
             a.edit
                 opacity: 1
@@ -70,6 +71,7 @@
             line-height: 1.2
             margin-bottom: 0
         .todo-footer
+            margin-top: 20px
             ul
                 margin: 0
                 width: 16px

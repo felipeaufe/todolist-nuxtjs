@@ -2,11 +2,7 @@
     <div class="frame">
         <div class="title">
             <div>
-                <input type="text" v-model="title" @blur="onTitleBlur" placeholder="Adicionar outra lista">
-                <!-- <p>
-                    {{ column.title }}
-                    <span>{{ column.tasks.length }}</span>
-                </p> -->
+                <input type="text" v-model="title" @keyup.enter="updateTitle" @blur="updateTitle" placeholder="Adicionar outra lista">
                 <div class="frame-menu" v-click-outside="outsideClick">
                     <a href="#" v-on:click="toggleMenu">
                         <i>...</i>
@@ -20,9 +16,9 @@
                 </div>
             </div>
         </div>
-        <draggable :list="column.tasks" :animation="200" ghost-class="ghost-card" group="tasks">
+        <draggable :list="frame.todos" :animation="200" :move="checkMove" ghost-class="ghost-card" group="todos">
             
-            <card v-for="(task) in column.tasks" :key="task.id" :task="task"></card>
+            <card v-for="(todo) in cards" :key="todo.id" :todo="todo"></card>
 
             <a href="#" class="add-card" v-on:click="newCard">
                 <i><svg height="426.66667pt" viewBox="0 0 426.66667 426.66667" width="426.66667pt" xmlns="http://www.w3.org/2000/svg"><path d="m405.332031 192h-170.664062v-170.667969c0-11.773437-9.558594-21.332031-21.335938-21.332031-11.773437 0-21.332031 9.558594-21.332031 21.332031v170.667969h-170.667969c-11.773437 0-21.332031 9.558594-21.332031 21.332031 0 11.777344 9.558594 21.335938 21.332031 21.335938h170.667969v170.664062c0 11.777344 9.558594 21.335938 21.332031 21.335938 11.777344 0 21.335938-9.558594 21.335938-21.335938v-170.664062h170.664062c11.777344 0 21.335938-9.558594 21.335938-21.335938 0-11.773437-9.558594-21.332031-21.335938-21.332031zm0 0"/></svg></i>
@@ -36,11 +32,14 @@
 
     import draggable from "vuedraggable";
     import Card from "../card/Card";
+    import { mapGetters } from 'vuex'
+    import { debounce } from '../../../heplers/debounce'
 
     export default {
         data () {
             return {
                 frame_menu: false,
+                cards: [],
                 title: ""
             }
         },
@@ -49,22 +48,57 @@
             Card,
         },
         props: {
-            column: {
+            frames: {
+                type: Array,
+                default: () => ([])
+            },
+            frame: {
                 type: Object,
                 default: () => ({})
             }
         },
         mounted () {
-            this.title =  this.column.title;
+            this.title =  this.frame.title;
         },
         methods: {
+            debounce () {},
+            checkMove (evt) {
 
-            onTitleBlur(){
-                if(this.title !== this.column.title && this.title.length){
-                    this.column.title = this.title;
-                    this.$store.commit('frame/updateFrame', this.column);   
+                let cardsUpdate = []; // Just update position
+                let cardsChange = []; // Change frame
+
+                this.frames.forEach( (frame) => {
+                    frame.todos.forEach( (card, index) => {
+                        let _card = JSON.parse(JSON.stringify(card));
+                        _card.order = index;
+                        _card.frame_id = frame.id;
+
+                        // Change frame?
+                        if(card.frame_id !== frame.id){
+                            _card.frame_id_old = card.frame_id;
+                            cardsChange.push(_card)
+                        }
+                        
+                        // Update position?
+                        else if(card.order !== index){
+                            cardsUpdate.push(_card);
+                        }
+                    })
+                });
+                console.log({ cardsUpdate, cardsChange });
+                this.$store.dispatch('card/updateCollection', cardsUpdate.concat(cardsChange));
+            },
+            updateTitle(event){
+                if(this.title !== this.frame.title && this.title.length){
+                    this.frame.title = this.title;
+                    this.$store.dispatch('frame/updateFrame', this.frame);   
+
+                    if(event){
+                        event.target.blur();
+                    } 
                 }
             },
+
             async removeFrame (){
                 
                 let messages = {
@@ -75,12 +109,8 @@
                 };
 
                 if(await this.$modalConfirm(messages)){
-                    this.$store.dispatch('frame/removeFrame', this.column.id);
+                    this.$store.dispatch('frame/removeFrame', this.frame.id);
                 }
-            },
-
-            updateFrame(){
-                // Update frame...
             },
 
             toggleMenu() {
@@ -92,10 +122,30 @@
                     this.toggleMenu();
                 }
             },
+
             async newCard() {
-                await this.$store.commit('card/newCard');
+                await this.$store.commit('card/newCard', {
+                    id: this.frame.id,
+                    card_order: this.frame.todos.length
+                });
                 this.$root.$emit('bv::show::modal', 'card-modal')
             },
+            sortCards(cards){
+                this.cards = cards.sort(function(a, b) {
+                    var keyA = a.order,
+                        keyB = b.order;
+                    // Compare the 2 dates
+                    if (keyA < keyB) return -1;
+                    if (keyA > keyB) return 1;
+                    return 0;
+                });
+            }
+        },
+        created() {
+            this.checkMove = debounce(this.checkMove, 3000);
+        },
+        mounted () {
+            this.sortCards(this.frame.todos)
         }
     }
 </script>

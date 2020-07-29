@@ -22,7 +22,7 @@
                                 C36.587,19.056,36.568,21.308,35.166,22.712z"/>
                         </svg>
                     </i>
-                    <input type="text" v-model="form.title" name="" id="" placeholder="Insira um título para este carão...">
+                    <input type="text" v-model="title" name="" id="" placeholder="Insira um título para este carão...">
                 </div>
 
                 <!-- Close -->
@@ -42,20 +42,29 @@
                             <li></li>
                         </ul>
                     </i>
-                    <textarea name="" v-model="form.description" id="" placeholder="Adicione uma descrição mais detalhada..." cols="30" rows="10"></textarea>
+                    <textarea name="" v-model="description" id="" placeholder="Adicione uma descrição mais detalhada..." cols="30" rows="10"></textarea>
                 </div>
             </template>
                 
             <!-- Footer -->
             <template v-slot:modal-footer="{}">
 
-                <b-button size="sm" variant="danger" class="btn-light" @click="close()">
-                    Sair
-                </b-button>
+                <div>
+                    <b-button size="sm" variant="none" class="btn-outline-light remove" @click="removeCard()">
+                        <i class="icon trash">
+                            <svg id="Layer_1" enable-background="new 0 0 512 512" height="512" viewBox="0 0 512 512" width="512" xmlns="http://www.w3.org/2000/svg"><g><path d="m424 64h-88v-16c0-26.51-21.49-48-48-48h-64c-26.51 0-48 21.49-48 48v16h-88c-22.091 0-40 17.909-40 40v32c0 8.837 7.163 16 16 16h384c8.837 0 16-7.163 16-16v-32c0-22.091-17.909-40-40-40zm-216-16c0-8.82 7.18-16 16-16h64c8.82 0 16 7.18 16 16v16h-96z"/><path d="m78.364 184c-2.855 0-5.13 2.386-4.994 5.238l13.2 277.042c1.22 25.64 22.28 45.72 47.94 45.72h242.98c25.66 0 46.72-20.08 47.94-45.72l13.2-277.042c.136-2.852-2.139-5.238-4.994-5.238zm241.636 40c0-8.84 7.16-16 16-16s16 7.16 16 16v208c0 8.84-7.16 16-16 16s-16-7.16-16-16zm-80 0c0-8.84 7.16-16 16-16s16 7.16 16 16v208c0 8.84-7.16 16-16 16s-16-7.16-16-16zm-80 0c0-8.84 7.16-16 16-16s16 7.16 16 16v208c0 8.84-7.16 16-16 16s-16-7.16-16-16z"/></g></svg>
+                        </i>
+                    </b-button>
+                </div>
+                <div>
+                    <b-button size="sm" variant="danger" class="btn-light" @click="close()">
+                        Sair
+                    </b-button>
 
-                <b-button size="sm" variant="success" @click="save()">
-                    Salvar
-                </b-button>
+                    <b-button size="sm" variant="success" @click="save()" :disabled="disabled">
+                        Salvar
+                    </b-button>
+                </div>
 
             </template>
         </b-modal>
@@ -68,12 +77,12 @@
     export default {
         data ()  {
             return {
-                form: {
-                    title: "",
-                    description: "",
-                    frame_id: "",
-                    open: true,
-                }
+                title: "",
+                description: "",
+                frame_id: "",
+                open: true,
+                disabled: true,
+                id: null,
             }
         },
         computed: {
@@ -84,16 +93,23 @@
                 "getCard",
             ]),
         },
-         watch: {
+        watch: {
             /**
              * Ensures that values are always consulted.
              */
             version () {
-                this.form.title        = this.getCard.title;
-                this.form.description  = this.getCard.description;
-                this.form.frame_id     = this.getCard.frame_id;
-                this.form.open         = this.getCard.open;
-            }
+                this.title        = this.getCard.title;
+                this.description  = this.getCard.description;
+                this.frame_id     = this.getCard.frame_id;
+                this.open         = this.getCard.open;
+                this.id           = this.getCard.id;
+            },
+            title (newValue, oldValue) {
+                this.disabled = this.enableButton(this.getCard.title, newValue);
+            },
+            description (newValue, oldValue ) {
+                this.disabled = this.enableButton(this.getCard.description, newValue);
+            },
         },
         methods: {
             close () {
@@ -104,15 +120,63 @@
 
                 this.$refs['card-modal'].hide()
             },
-            save () {
-                // this.reset();
-                console.log("Save modal")
+            async save () {
+                //  Update card
+                
+                if(this.id){
+                    let res = await this.$store.dispatch('card/updateCard', {
+                        title: this.title,
+                        description: this.description,
+                        open: this.open,
+                        id: this.id,
+                    });
+                }
+                
+                // New card
+                else{
+                    this.$store.dispatch('card/addCard', {
+                        title: this.title,
+                        description: this.description,
+                        frame_id: this.frame_id,
+                        open: this.open
+                    });
+                }
+                
+                this.close();
+            },
+            async removeCard (){
+                
+                let messages = {
+                    title: 'Apagar cartão',
+                    description: 'Deseja realmente apagar este cartão?',
+                    btnYes: 'Sim',
+                    btnNo: 'Agora não'
+                };
+
+                if(await this.$modalConfirm(messages)){
+                    let res = await this.$store.dispatch('card/removeCard', {
+                        id: this.id,
+                        frame_id: this.frame_id,
+                    });
+                    if(res){
+                        this.close();
+                        this.reset();
+                    }
+                }
             },
             reset () {
-                this.form.title = "";
-                this.form.description = "";
-                this.form.frame_id = "";
-                this.form.open = "";
+                this.title = "";
+                this.description = "";
+                this.frame_id = "";
+                this.open = "";
+                this.id = "";
+            },
+            enableButton(newValue, defaultValue){
+                if(defaultValue === newValue){
+                    return true;
+                }
+                
+                return false;
             }
         }
     }
@@ -166,9 +230,26 @@
             i.icon.close
                 cursor: pointer
                 svg
-                    width: 14px;
-                    height: auto;
+                    width: 14px
+                    height: auto
         .modal-footer
+            justify-content: space-between
             button
                 padding: 8px 20px
+                &.btn-success
+                    margin-left: 10px
+                &.remove
+                    padding-left: 15px
+                    padding-right: 15px
+                    border: none
+                    &:hover
+                        .icon.trash svg path
+                            fill: black
+                    .icon 
+                        &.trash
+                            svg
+                                width: 20px
+                                height: auto
+                                path
+                                    fill: gray
 </style>
