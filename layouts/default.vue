@@ -1,5 +1,6 @@
 <template>
-    <div id="layout" :data-theme="getTheme || theme">
+    <!-- <div id="layout" :data-theme="getTheme || theme"> -->
+    <div id="layout">
         <main>
             <Header />
             <Nuxt />
@@ -25,9 +26,14 @@
                 "getTheme",
             ])
         },
+        watch: {
+            getTheme() {
+                document.body.setAttribute("data-theme", this.getTheme)
+            }
+        },
         mounted(){
             // Force update on DOM
-            document.querySelector("#layout").setAttribute("data-theme", this.getTheme)
+            document.body.setAttribute("data-theme", this.getTheme)
         }
     }
 </script>
@@ -37,7 +43,12 @@
         display: grid        
         grid-template: 	"sidebar main"
         grid-template-columns: max-content
+        @media (min-width: 320px) and (max-width: 767px)
+            position: relative
 
         main
             grid-area: main
+            width: calc(100vw - 56px)
+            @media (min-width: 320px) and (max-width: 767px)
+                width: 100vw
 </style>

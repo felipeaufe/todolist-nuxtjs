@@ -1,11 +1,13 @@
 <template>
     <section id="board">
         <!-- Frames created -->
-        <draggable :list="frames" :animation="200" :move="checkMove(this)" ghost-class="ghost-card" group="frames"> 
-            <Frame v-for="frame in frames" :frames="frames" :key="frame.id"
-                :frame="frame"
-            />
-        </draggable>
+        <div class="frames-draggable" :key="_version">
+            <draggable :list="frames" :animation="200" :move="checkMove(this)" ghost-class="ghost-card" group="frames"> 
+                <Frame v-for="frame in frames" :frames="frames" :key="frame.id"
+                    :frame="frame"
+                />
+            </draggable>
+        </div>
 
         <!-- Add new Frame -->
         <div>
@@ -14,6 +16,13 @@
 
         <!-- Edit card modal -->
         <ModalCard ref="modal"/>
+
+        <p id="saving">
+            Salvando
+            <i>.</i>
+            <i>.</i>
+            <i>.</i>
+        </p>
     </section>
 </template>
 
@@ -35,7 +44,8 @@
         },
         data() {
             return {
-                frames: []
+                frames: [],
+                _version: 0
             };
         },
         computed: {
@@ -50,11 +60,15 @@
             /**
              * Ensures that values are always consulted.
              */
-            version () {
+            version (key) {
                 // Force break reference
                 let frames = JSON.parse(JSON.stringify(this.getFrames));
 
                 this.sortFrames(frames);
+
+                // Force element reload
+                // ** This can be improved by applying only to the edited card;
+                this._version = key;
             }
         },
         methods: {
@@ -97,7 +111,39 @@
         overflow: scroll
         display: flex
         align-items: flex-start
-        > div
+        @media (min-width: 320px) and (max-width: 767px)
+            padding-left: 5px
+            height: calc(100vh - 90px)
+        > .frames-draggable > div
             flex-direction: row
-            display: flex        
+            display: flex    
+
+        #saving
+            opacity: 0
+            position: absolute
+            bottom: 20px
+            right: 30px
+            font-size: 18px
+            font-weight: 600
+            color: #3c0e6c
+            pointer-events: none
+            transition: opacity 0.2s ease-in-out
+            &.show
+                opacity: 1
+            i
+                animation-name: blink
+                animation-duration: 1.4s
+                animation-iteration-count: infinite
+                animation-fill-mode: both
+                &:nth-child(2)
+                    animation-delay: .2s
+                &:nth-child(3)
+                    animation-delay: .4s
+    @keyframes blink
+        0%
+            opacity: .2
+        20%
+            opacity: 1
+        100%
+            opacity: .2
 </style>

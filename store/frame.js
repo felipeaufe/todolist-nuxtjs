@@ -7,7 +7,6 @@ export const state = () => ({
 
 export const actions = {
     async initialize({commit}){
-        console.warn("initialize")
         let res = await this.$axios.get("/frames");
         try{
             commit('initialize', res.data.data);
@@ -19,7 +18,6 @@ export const actions = {
 
     async removeFrame ({commit}, frame_id) {
         let res = await this.$axios.delete("/frame/" + frame_id);
-        console.log("res", res)
         try{
             if(res.data.return_code === 1){
                 commit('removeFrame', frame_id);
@@ -106,11 +104,13 @@ export const actions = {
     },
 
     updateCard( {commit, state}, card) {
+
         let frame_index = state.frames.findIndex( (frame) => {
             if(frame.id === card.frame_id){
                 return frame;
             }
         })
+
         let card_index = state.frames[frame_index].todos.findIndex( (_card) => {
             if(_card.id === card.id){
                 return _card;
@@ -152,6 +152,7 @@ export const mutations = {
     },
 
     addFrame (state, frame) {
+        frame.todos = frame.todos = [];
         state.frames.push(frame);
         state.version = this.$newVersion();
     },

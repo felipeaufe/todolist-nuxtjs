@@ -57,10 +57,13 @@
                     </b-button>
                 </div>
                 <div>
-                    <b-button size="sm" variant="danger" class="btn-light" @click="close()">
-                        Sair
-                    </b-button>
-
+                    <label v-if="frame_id.length" for="open-input" class="open-button btn btn-sm btn-light"  @click="toggleOpen" v-bind:class="{ 'actived': !open }">
+                        <p>{{ open ? 'Finalizar' : 'Finalizado' }}</p>
+                        <i class="icon open">
+                            <svg v-if="!open" viewBox="0 -46 417.81333 417"><path d="m159.988281 318.582031c-3.988281 4.011719-9.429687 6.25-15.082031 6.25s-11.09375-2.238281-15.082031-6.25l-120.449219-120.46875c-12.5-12.5-12.5-32.769531 0-45.246093l15.082031-15.085938c12.503907-12.5 32.75-12.5 45.25 0l75.199219 75.203125 203.199219-203.203125c12.503906-12.5 32.769531-12.5 45.25 0l15.082031 15.085938c12.5 12.5 12.5 32.765624 0 45.246093zm0 0"/></svg>
+                        </i>
+                        <input type="checkbox" name="" id="open-input" v-model="open">
+                    </label>
                     <b-button size="sm" variant="success" @click="save()" :disabled="disabled">
                         Salvar
                     </b-button>
@@ -82,6 +85,7 @@
                 frame_id: "",
                 open: true,
                 disabled: true,
+                order: null,
                 id: null,
             }
         },
@@ -102,6 +106,7 @@
                 this.description  = this.getCard.description;
                 this.frame_id     = this.getCard.frame_id;
                 this.open         = this.getCard.open;
+                this.order        = this.getCard.order;
                 this.id           = this.getCard.id;
             },
             title (newValue, oldValue) {
@@ -120,14 +125,20 @@
 
                 this.$refs['card-modal'].hide()
             },
+            toggleOpen(){
+                setTimeout(() => {
+                    this.save();
+                },80)
+            },
             async save () {
                 //  Update card
-                
                 if(this.id){
-                    let res = await this.$store.dispatch('card/updateCard', {
+                    await this.$store.dispatch('card/updateCard', {
                         title: this.title,
                         description: this.description,
                         open: this.open,
+                        order: this.order,
+                        frame_id: this.frame_id,
                         id: this.id,
                     });
                 }
@@ -193,6 +204,19 @@
             width: 100%
             height: 40px
             border: none
+            color: var(--card-text-color)
+            &::-webkit-input-placeholder
+                color: var(--card-text-color)
+            &:-moz-placeholder
+                color: var(--card-text-color)
+            &::-moz-placeholder
+                color: var(--card-text-color)
+            &:-ms-input-placeholder
+                color: var(--card-text-color)
+            &::-ms-input-placeholder
+                color: var(--card-text-color)
+            &::placeholder
+                color: var(--card-text-color)
 
         textarea
             min-height: 81px
@@ -208,8 +232,8 @@
                 svg
                     width: 20px
                     height: auto
-                    path
-                        fill: #585858
+                    *
+                        fill: var(--card-text-color)
             &.text
                 align-items: flex-start
                 padding-top: 9px
@@ -220,7 +244,7 @@
                     padding: 0
                     list-style-type: none
                     li
-                        background-color: #585858
+                        background-color: var(--card-text-color)
                         height: 2px
                         margin-bottom: 1px
                         &:last-of-type
@@ -232,8 +256,47 @@
                 svg
                     width: 14px
                     height: auto
+                    *
+                        fill: var(--card-text-color-light)
         .modal-footer
             justify-content: space-between
+            > div:last-of-type
+                display: flex
+                align-items: center
+            .open-button
+                display: flex
+                flex-direction: row
+                align-items: center
+                justify-content: center
+                margin-bottom: 0
+                padding: 8px 20px
+                width: 125px
+                &.actived
+                    border-color: var(--card-open-color)
+                p
+                    margin-bottom: 0
+                    display: block
+                    width: 65px
+                i
+                    min-width: 17px
+                    height: 17px
+                    background-color: white
+                    position: relative
+                    border: 1px solid #c5c5c5
+                    border-radius: 3px
+                    margin-left: 7px
+                    svg
+                        width: 16px
+                        height: 16px
+                        position: absolute
+                        right: -4px
+                        top: -2px
+                        *
+                            fill: var(--card-open-color)
+                input
+                    width: 0
+                    height: 0
+                    opacity: 0
             button
                 padding: 8px 20px
                 &.btn-success
@@ -250,6 +313,6 @@
                             svg
                                 width: 20px
                                 height: auto
-                                path
-                                    fill: gray
+                                *
+                                    fill: var(--card-text-color-light)
 </style>

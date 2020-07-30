@@ -4,7 +4,7 @@
             <div>
                 <input type="text" v-model="title" @keyup.enter="updateTitle" @blur="updateTitle" placeholder="Adicionar outra lista">
                 <div class="frame-menu" v-click-outside="outsideClick">
-                    <a href="#" v-on:click="toggleMenu">
+                    <a href="#" @click="toggleMenu">
                         <i>...</i>
                     </a>
                     <aside :class="{ 'show': frame_menu } ">
@@ -20,11 +20,11 @@
             
             <card v-for="(todo) in cards" :key="todo.id" :todo="todo"></card>
 
-            <a href="#" class="add-card" v-on:click="newCard">
-                <i><svg height="426.66667pt" viewBox="0 0 426.66667 426.66667" width="426.66667pt" xmlns="http://www.w3.org/2000/svg"><path d="m405.332031 192h-170.664062v-170.667969c0-11.773437-9.558594-21.332031-21.335938-21.332031-11.773437 0-21.332031 9.558594-21.332031 21.332031v170.667969h-170.667969c-11.773437 0-21.332031 9.558594-21.332031 21.332031 0 11.777344 9.558594 21.335938 21.332031 21.335938h170.667969v170.664062c0 11.777344 9.558594 21.335938 21.332031 21.335938 11.777344 0 21.335938-9.558594 21.335938-21.335938v-170.664062h170.664062c11.777344 0 21.335938-9.558594 21.335938-21.335938 0-11.773437-9.558594-21.332031-21.335938-21.332031zm0 0"/></svg></i>
-                Adicionar novo cartão
-            </a>
         </draggable>
+        <a href="#" class="add-card" @click="newCard">
+            <i><svg height="426.66667pt" viewBox="0 0 426.66667 426.66667" width="426.66667pt" xmlns="http://www.w3.org/2000/svg"><path d="m405.332031 192h-170.664062v-170.667969c0-11.773437-9.558594-21.332031-21.335938-21.332031-11.773437 0-21.332031 9.558594-21.332031 21.332031v170.667969h-170.667969c-11.773437 0-21.332031 9.558594-21.332031 21.332031 0 11.777344 9.558594 21.335938 21.332031 21.335938h170.667969v170.664062c0 11.777344 9.558594 21.335938 21.332031 21.335938 11.777344 0 21.335938-9.558594 21.335938-21.335938v-170.664062h170.664062c11.777344 0 21.335938-9.558594 21.335938-21.335938 0-11.773437-9.558594-21.332031-21.335938-21.332031zm0 0"/></svg></i>
+            Adicionar novo cartão
+        </a>
     </div>
 </template>
 
@@ -57,9 +57,6 @@
                 default: () => ({})
             }
         },
-        mounted () {
-            this.title =  this.frame.title;
-        },
         methods: {
             debounce () {},
             checkMove (evt) {
@@ -85,8 +82,12 @@
                         }
                     })
                 });
-                console.log({ cardsUpdate, cardsChange });
-                this.$store.dispatch('card/updateCollection', cardsUpdate.concat(cardsChange));
+                let cards = cardsUpdate.concat(cardsChange);
+
+                if(cards.length){
+                    this.$store.dispatch('card/updateCollection', cards);
+                    this.showSaving();
+                }
             },
             updateTitle(event){
                 if(this.title !== this.frame.title && this.title.length){
@@ -139,12 +140,31 @@
                     if (keyA > keyB) return 1;
                     return 0;
                 });
-            }
+            },
+            showSaving() {
+                let saving = document.querySelector("#saving");
+                if(saving){
+                    if(!saving.classList.contains("show")){
+                        saving.classList.add("show");
+                        setTimeout(()=>{
+                            this.hideSaving();
+                        }, 3000)
+                    }
+                }
+            },
+            hideSaving (){
+                let saving = document.querySelector("#saving");
+                if(saving){
+                    saving.classList.remove("show")
+                }
+            },
         },
         created() {
-            this.checkMove = debounce(this.checkMove, 3000);
+            this.checkMove  = debounce(this.checkMove, 3000);
+            this.showSaving = debounce(this.showSaving, 2000);
         },
         mounted () {
+            this.title =  this.frame.title;
             this.sortCards(this.frame.todos)
         }
     }
@@ -158,6 +178,7 @@
         margin: 0 8px
         padding: 0 13px 13px
         width: 280px
+        position: relative
         .title
             >div
                 display: flex
@@ -171,8 +192,22 @@
                     margin: 10px -5px
                     color: var(--frame-title)
                     background: none
+                    cursor: pointer
                     &:focus
+                        cursor: auto
                         background: white
+                    &::-webkit-input-placeholder
+                        color: var(--frame-title)
+                    &:-moz-placeholder
+                        color: var(--frame-title)
+                    &::-moz-placeholder
+                        color: var(--frame-title)
+                    &:-ms-input-placeholder
+                        color: var(--frame-title)
+                    &::-ms-input-placeholder
+                        color: var(--frame-title)
+                    &::placeholder
+                        color: var(--frame-title)
                         
                 p
                     font-weight: 700
@@ -186,7 +221,7 @@
                         margin-left: 2px
             .frame-menu
                 position: relative
-                z-index: 1
+                z-index: 2
                 > a
                     display: block
                     width: 30px
@@ -228,13 +263,23 @@
                                 color: black
                                 font-size: 15px
         > div
+            &::after
+                content: ' '
+                position: absolute
+                top: 55px
+                bottom: 0
+                left: 0
+                right: 0
         .add-card
             text-decoration: none
             color: black
             width: 100%
             display: block
             padding: 5px
-            color: var(--frame-color-light)
+            color: var(--frame-text-color-light)
+            border-radius: 5px
+            z-index: 2
+            position: relative
             &:hover
                 background-color: var(--frame-hover)
                 color: var(--frame-color)
@@ -246,5 +291,5 @@
                     width: 14px
                     height: auto
                     path
-                        fill: var(--frame-color-light)
+                        fill: var(--frame-text-color-light)
 </style>

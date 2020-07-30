@@ -1,5 +1,8 @@
 <template>
     <div class="card" @click="editCard">
+        <div class="card-closed" v-if="!todo.open">
+            Finalizado
+        </div>
         <div class="info">
             <p class="todo-title">{{todo.title}}</p>
             <div class="todo-footer">
@@ -32,16 +35,7 @@
             },
         },
         computed: {
-            badgeColor() {
-                const mappings = {
-                    Design: "purple",
-                    "Feature Request": "teal",
-                    Backend: "blue",
-                    QA: "green",
-                    default: "teal"
-                };
-                return mappings[this.todo.type] || mappings.default;
-            }
+            
         },
         methods: {
             async editCard() {
@@ -57,16 +51,28 @@
         border: none
         box-shadow: 0px 0px 5px 0px #0000001f
         margin-bottom: 10px
-        // margin: 0 10px 10px
         padding: 15px
         cursor: pointer
         display: flex
         flex-direction: row
         justify-content: space-between
+        z-index: 1
+        position: relative
         &:hover
             a.edit
                 opacity: 1
+        .card-closed
+            position: absolute
+            bottom: 0
+            right: 0
+            background-color: var(--card-open-color)
+            font-size: 9px
+            padding: 4px 9px
+            border-top-left-radius: 5px
+            color: white
+            font-weight: 600
         p.todo-title
+            color: var(--frame-title)
             font-size: 15px
             line-height: 1.2
             margin-bottom: 0
@@ -79,7 +85,7 @@
                 padding: 0
                 list-style-type: none
                 li
-                    background-color: var(--frame-hover)
+                    background-color: var(--card-text-color)
                     height: 2px
                     margin-bottom: 1px
                     &:last-of-type
@@ -101,4 +107,6 @@
                 svg
                     width: 13px
                     height: auto
+                    *
+                        fill: var(--card-text-color)
 </style>

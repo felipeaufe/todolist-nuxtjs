@@ -6,7 +6,6 @@ export const mutations = {
     // Change theme
     change (state, newTheme) {
         state.name = newTheme;
-        console.warn("CHANGE: ", state.name)
         if (process.browser) {
             window.localStorage.setItem('theme', newTheme);
         }
@@ -16,7 +15,7 @@ export const mutations = {
     initialise (state) {
         if (process.browser) {
             let _theme = window.localStorage.getItem('theme');
-            state.name = _theme || "light-theme";;
+            state.name = _theme || "purple-theme";;
         }
     }
 }

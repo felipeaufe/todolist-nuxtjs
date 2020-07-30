@@ -63,9 +63,10 @@ export const actions = {
                 title:       card.title,
                 description: card.description,
                 open:        card.open,
+                frame_id:    card.frame_id,
                 order:       card.order,
             });
-    
+
             try{
                 if(res.data.return_code === 1){
                     dispatch('frame/updateCard', res.data.data, {root:true});
@@ -87,7 +88,6 @@ export const actions = {
             message = "";
 
         for (const card of cards) {
-            console.log({card})
             let res = await this.$axios.put("/todo", {
                 id:          card.id,
                 frame_id:    card.frame_id,
@@ -107,7 +107,6 @@ export const actions = {
             console.error(`Update Collection Error: ${message}`);
         }
     }
-
 }
 
 export const mutations = {

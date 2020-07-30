@@ -58,6 +58,20 @@
         display: flex
         flex-direction: column
         justify-content: space-between
+        transition: left 0.2s ease-in-out
+        z-index: 10
+        @media (min-width: 320px) and (max-width: 767px)
+            position: absolute
+            left: -70px
+            width: 70px
+            top: 57px
+            bottom: 0
+            height: auto
+        &.opened
+            left: 0px
+        #logo
+            @media (min-width: 320px) and (max-width: 767px)
+                display: none
         section
             &:first-of-type
                 padding-top: 8px

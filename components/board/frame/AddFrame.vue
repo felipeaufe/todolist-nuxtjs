@@ -41,28 +41,47 @@
 
 <style lang="sass">
     .add-frame
-        background-color: var(--frame-bg)
+        background-color: var(--frame-bg-dark)
         border-radius: 6px
         padding: 10px 5fdpx
         margin: 0 8px
-        padding: 0 13px 13px
+        padding: 0 13px
         width: 280px
         display: flex
         flex-direction: column
         align-items: flex-start
+        transition: background-color 0.2s ease-in-out
+        &:focus-within
+            background-color: var(--frame-bg)
         input
             border: none
             font-weight: 700
+            width: 100%
             padding: 5px
             margin: 10px -5px
             color: var(--frame-title)
             background: none
+            cursor: pointer
             &:focus
+                cursor: auto
                 background: white
                 ~ button
                     display: block
+            &::-webkit-input-placeholder
+                color: var(--frame-title)
+            &:-moz-placeholder
+                color: var(--frame-title)
+            &::-moz-placeholder
+                color: var(--frame-title)
+            &:-ms-input-placeholder
+                color: var(--frame-title)
+            &::-ms-input-placeholder
+                color: var(--frame-title)
+            &::placeholder
+                color: var(--frame-title)
         button
             display: none
+            margin-bottom: 15px
             &:hover
                 display: block
 

@@ -7,14 +7,14 @@
         </a>
         <aside>
             <ul>
-                <li class="light">
-                    <a href="#" v-on:click="changeTheme('light-theme')"></a>
+                <li class="purple">
+                    <a href="#" v-on:click="changeTheme('purple-theme')"></a>
                 </li>
                 <li class="dark">
                     <a href="#" v-on:click="changeTheme('dark-theme')"></a>
                 </li>
-                <li class="purple">
-                    <a href="#" v-on:click="changeTheme('purple-theme')"></a>
+                <li class="turquoise">
+                    <a href="#" v-on:click="changeTheme('turquoise-theme')"></a>
                 </li>
             </ul>
         </aside>
@@ -45,6 +45,8 @@
                 background-color: #ffffff0d
             aside
                 left: 60px
+                @media (min-width: 320px) and (max-width: 767px)
+                    left: 70px
         aside
             position: absolute
             top: 0
@@ -71,15 +73,15 @@
                     box-shadow: 0px 0px 8px -4px black
                     border: 2px solid
                     margin: 0 8px
-                    &.light
-                        background-color: var(--light-theme)
-                        border-color:  var(--light-theme-border)
-                    &.dark
-                        background-color: var(--dark-theme)
-                        border-color:  var(--dark-theme-border)
                     &.purple
                         background-color: var(--purple-theme)
                         border-color:  var(--purple-theme-border)
+                    &.dark
+                        background-color: var(--dark-theme)
+                        border-color:  var(--dark-theme-border)
+                    &.turquoise
+                        background-color: var(--turquoise-theme)
+                        border-color:  var(--turquoise-theme-border)
                     a
                         display: block
                         height: 100%
