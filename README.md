@@ -1,4 +1,4 @@
-# Ootz porject with NuxtJs
+# Ootz project with NuxtJs
 Project carried out as tests of technical skills in NuxtJs (VueJs) for [Ootz](http://www.ootz.com.br/).
 
 The following requirements were assessed for this project:
