@@ -5,7 +5,7 @@
 
         <b-navbar-brand>
             <Logo/>
-            <p>Ootz - Teste de habilidade</p>
+            <p>Ootz - NuxtJs Project</p>
         </b-navbar-brand>
     </b-navbar>
 </template>
