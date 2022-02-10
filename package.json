@@ -18,7 +18,7 @@
     "vuedraggable": "^2.24.0"
   },
   "devDependencies": {
-    "node-sass": "4.12.x",
+    "node-sass": "7.0.x",
     "pug": "3.0.0",
     "pug-plain-loader": "1.0.0",
     "sass-loader": "7.1.0"
